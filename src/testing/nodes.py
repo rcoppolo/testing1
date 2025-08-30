@@ -124,10 +124,10 @@ class Example:
 # A dictionary that contains all nodes you want to export with their names
 # NOTE: names should be globally unique
 NODE_CLASS_MAPPINGS = {
-    "WildExample": Example
+    "WildExample2": Example
 }
 
 # A dictionary that contains the friendly/humanly readable titles for the nodes
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "WildExample": "Wild Example Node 1.2"
+    "WildExample2": "Wild Example Node 2"
 }
