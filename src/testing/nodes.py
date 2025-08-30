@@ -1,4 +1,6 @@
 from inspect import cleandoc
+import subprocess
+
 class Example:
     """
     A example node
@@ -50,22 +52,28 @@ class Example:
         return {
             "required": {
                 "image": ("IMAGE", { "tooltip": "This is an image"}),
-                "int_field": ("INT", {
+                "session": ("INT", {
                     "default": 0,
                     "min": 0, #Minimum value
                     "max": 4096, #Maximum value
-                    "step": 64, #Slider's step
+                    "step": 1, #Slider's step
                     "display": "number" # Cosmetic only: display as "number" or "slider"
                 }),
-                "float_field": ("FLOAT", {
-                    "default": 1.0,
-                    "min": 0.0,
-                    "max": 10.0,
-                    "step": 0.01,
-                    "round": 0.001, #The value represeting the precision to round to, will be set to the step value by default. Can be set to False to disable rounding.
-                    "display": "number"}),
-                "print_to_screen": (["enable", "disable"],),
-                "string_field": ("STRING", {
+                "window": ("INT", {
+                    "default": 0,
+                    "min": 0, #Minimum value
+                    "max": 4096, #Maximum value
+                    "step": 1, #Slider's step
+                    "display": "number" # Cosmetic only: display as "number" or "slider"
+                }),
+                "pane": ("INT", {
+                    "default": 0,
+                    "min": 0, #Minimum value
+                    "max": 4096, #Maximum value
+                    "step": 1, #Slider's step
+                    "display": "number" # Cosmetic only: display as "number" or "slider"
+                }),
+                "grep": ("STRING", {
                     "multiline": False, #True if you want the field to look like the one on the ClipTextEncode node
                     "default": "Hello World!"
                 }),
@@ -82,13 +90,20 @@ class Example:
 
     CATEGORY = "Example"
 
-    def test(self, image, string_field, int_field, float_field, print_to_screen):
-        if print_to_screen == "enable":
-            print(f"""Your input contains:
-                string_field aka input text: {string_field}
-                int_field: {int_field}
-                float_field: {float_field}
-            """)
+    def test(self, image, session, window, pane, grep):
+        result = subprocess.Popen(['tmux', 'capture-pane', '-t', f"{session}:{window}.{pane}", '-p', '-S', '-'], stdout=subprocess.PIPE)
+        result = subprocess.run(['grep', f"{grep}"], stdin=result.stdout, capture_output=True, text=True)
+        print(f"""Your input:
+            session: {session}
+            window: {window}
+            pane: {pane}
+            grep: {grep}
+
+            Output:
+            -------------------------------------
+            {result}
+            -------------------------------------
+        """)
         #do some processing on the image, in this example I just invert it
         image = 1.0 - image
         return (image,)
@@ -114,5 +129,5 @@ NODE_CLASS_MAPPINGS = {
 
 # A dictionary that contains the friendly/humanly readable titles for the nodes
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "WildExample": "Wild Example Node 1.1"
+    "WildExample": "Wild Example Node 1.2"
 }
