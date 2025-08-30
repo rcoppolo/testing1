@@ -77,6 +77,7 @@ class Example:
                     "multiline": False, #True if you want the field to look like the one on the ClipTextEncode node
                     "default": "Hello World!"
                 }),
+                "restart_server": (["enable", "disable"],),
             },
         }
 
@@ -90,7 +91,12 @@ class Example:
 
     CATEGORY = "Example"
 
-    def test(self, image, session, window, pane, grep):
+    def test(self, image, session, window, pane, grep, restart_server):
+        if restart_server == "enable":
+            subprocess.run(['tmux', 'send-keys', '-t', f"{session}:{window}.{pane}", 'C-c'], capture_output=True, text=True)
+            subprocess.run(['tmux', 'send-keys', '-t', f"{session}:{window}.{pane}", 'Up'], capture_output=True, text=True)
+            subprocess.run(['tmux', 'send-keys', '-t', f"{session}:{window}.{pane}", 'Enter'], capture_output=True, text=True)
+
         result = subprocess.Popen(['tmux', 'capture-pane', '-t', f"{session}:{window}.{pane}", '-p', '-S', '-'], stdout=subprocess.PIPE)
         result = subprocess.run(['grep', f"{grep}"], stdin=result.stdout, capture_output=True, text=True)
         print(f"""Your input:
@@ -124,10 +130,10 @@ class Example:
 # A dictionary that contains all nodes you want to export with their names
 # NOTE: names should be globally unique
 NODE_CLASS_MAPPINGS = {
-    "WildExample2": Example
+    "WildExample3": Example
 }
 
 # A dictionary that contains the friendly/humanly readable titles for the nodes
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "WildExample2": "Wild Example Node 2"
+    "WildExample3": "Wild Example Node 3"
 }
